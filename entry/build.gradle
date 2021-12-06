@@ -17,11 +17,9 @@ ohos {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar', '*.har'])
     testImplementation 'junit:junit:4.13'
     implementation project(path: ':videoactiondetection')
     ohosTestImplementation 'com.huawei.ohos.testkit:runner:1.0.0.100'
-    //compile 'org.apache.tvm:tvm4j-core:0.0.1-SNAPSHOT'
 }
 decc {
     supportType = ['html','xml']
