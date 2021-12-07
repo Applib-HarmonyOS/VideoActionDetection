@@ -10,6 +10,6 @@ import ohos.aafwk.content.Intent;
 public class ExampleTest {
     @Test
     public void onStart() {
-        //super.setMainRoute(MainAbilitySlice.class.getName());
+        // Do nothing.
     }
 }

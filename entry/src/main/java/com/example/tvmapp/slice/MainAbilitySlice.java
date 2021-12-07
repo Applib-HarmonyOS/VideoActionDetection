@@ -33,12 +33,14 @@ public class MainAbilitySlice extends AbilitySlice {
         try {
             ifile = getFileFromRawFile(IMAGE_NAME, rawFileEntryImage, getCacheDir());
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtil.error(TAG, e.getMessage());
+            return;
         }
         try {
             fin = new FileInputStream(ifile);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            LogUtil.error(TAG, e.getMessage());
+            return;
         }
         InputStreamReader inputStreamReader = new InputStreamReader(fin);
         int size = IMG_CHANNEL * MODEL_INPUT_HEIGHT * MODEL_INPUT_WIDTH * IMG_DEPTH;
@@ -51,7 +53,8 @@ public class MainAbilitySlice extends AbilitySlice {
                 data[i++] = Float.parseFloat(line);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtil.error(TAG, e.getMessage());
+            return;
         }
 
         // get the function from the module(set input data)
@@ -64,31 +67,22 @@ public class MainAbilitySlice extends AbilitySlice {
     }
 
     private static File getFileFromRawFile(String filename, RawFileEntry rawFileEntry, File cacheDir)
-        throws IOException {
-        byte[] buf;
-        File file;
-        FileOutputStream output = null;
-
-        try {
-            file = new File(cacheDir, filename);
-            output = new FileOutputStream(file);
+            throws IOException {
+        byte[] buf1 = null;
+        File file1;
+        file1 = new File(cacheDir, filename);
+        try (FileOutputStream output1 = new FileOutputStream(file1)) {
             Resource resource = rawFileEntry.openRawFile();
-            buf = new byte[(int) rawFileEntry.openRawFileDescriptor().getFileSize()];
-            int bytesRead = resource.read(buf);
-            if (bytesRead != buf.length) {
-                throw new IOException("Video Action Detection: Asset Read failed!!!");
+            buf1 = new byte[(int) rawFileEntry.openRawFileDescriptor().getFileSize()];
+            int bytesRead = resource.read(buf1);
+            if (bytesRead != buf1.length) {
+                throw new IOException("Asset Read failed!!!");
             }
-            output.write(buf, 0, bytesRead);
-
-            return file;
-        } catch (IOException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            if (output != null) {
-                output.close();
-            }
+            output1.write(buf1, 0, bytesRead);
+            return file1;
         }
     }
+
     @Override
     public void onActive() {
         super.onActive();

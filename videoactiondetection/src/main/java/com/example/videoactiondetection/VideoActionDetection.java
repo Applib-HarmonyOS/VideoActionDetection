@@ -42,7 +42,7 @@ public class VideoActionDetection {
         try {
             modelGraph = new String(getBytesFromRawFile(rawFileEntryModel));
         } catch (IOException e) {
-            LogUtil.error(TAG, "Problem reading json graph file!" + e);
+            LogUtil.error(TAG, "Problem reading json graph file!" + e.getMessage());
             return; //failure
         }
 
@@ -55,10 +55,10 @@ public class VideoActionDetection {
             file = getFileFromRawFile(MODEL_CPU_LIB_FILE_NAME, rawFileEntryModelLib, cacheDir);
         } catch (IOException e) {
             LogUtil.error(TAG, e.getMessage());
+            return;
         }
 
         // tvm module for compiled functions
-        LogUtil.info(TAG, "VideoActionDetection: Model File Path: " + file.getAbsolutePath());
         Module modelLib = Module.load(file.getAbsolutePath());
 
         // get global function module for graph executor
@@ -79,7 +79,7 @@ public class VideoActionDetection {
         try {
             modelParams = getBytesFromRawFile(rawFileEntryModelParams);
         } catch (IOException e) {
-            LogUtil.error(TAG, "Problem reading model param file!" + e);
+            LogUtil.error(TAG, "Problem reading model param file!" + e.getMessage());
             return; //failure
         }
         LogUtil.info(TAG, "Reading model params completed: ");
@@ -99,7 +99,7 @@ public class VideoActionDetection {
             setInputFunc.pushArg(INPUT_NAME).pushArg(inputNdArray).invoke();
         } catch (Exception e) {
             LogUtil.info(TAG, "Video Action Detection: pusherror" + e.getMessage());
-            e.printStackTrace();
+            return null;
         }
 
         setInputFunc.release();
@@ -135,7 +135,6 @@ public class VideoActionDetection {
                 }
             }
             LogUtil.info(TAG, "Output predicted: " + maxPosition);
-            //return maxPosition;
             RawFileEntry rawFileEntrylabelfile = resManager.getRawFileEntry(LABEL_PATH);
             FileInputStream fin = null;
 
@@ -157,6 +156,7 @@ public class VideoActionDetection {
                 }
             } catch (IOException e) {
                 LogUtil.error(TAG, e.getMessage());
+                return null;
             }
             LogUtil.info(TAG, "Output label predicted is : " + outputLabel);
             return outputLabel;
@@ -167,29 +167,19 @@ public class VideoActionDetection {
     }
 
     private static File getFileFromRawFile(String filename, RawFileEntry rawFileEntry, File cacheDir)
-        throws IOException {
-        byte[] buf;
+            throws IOException {
+        byte[] buf = null;
         File file;
-        FileOutputStream output = null;
-
-        try {
-            file = new File(cacheDir, filename);
-            output = new FileOutputStream(file);
+        file = new File(cacheDir, filename);
+        try (FileOutputStream output = new FileOutputStream(file)) {
             Resource resource = rawFileEntry.openRawFile();
             buf = new byte[(int) rawFileEntry.openRawFileDescriptor().getFileSize()];
             int bytesRead = resource.read(buf);
             if (bytesRead != buf.length) {
-                throw new IOException("Video Action Detection: Asset Read failed!!!");
+                throw new IOException("Asset Read failed!!!");
             }
             output.write(buf, 0, bytesRead);
-
             return file;
-        } catch (IOException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            if (output != null) {
-                output.close();
-            }
         }
     }
 
