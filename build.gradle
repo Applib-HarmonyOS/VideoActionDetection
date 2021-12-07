@@ -1,10 +1,11 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 apply plugin: 'com.huawei.ohos.app'
 apply plugin: 'org.sonarqube'
+apply plugin: 'checkstyle'
 
 //For instructions on signature configuration, see https://developer.harmonyos.com/en/docs/documentation/doc-guides/ide_debug_device-0000001053822404#EN-US_TOPIC_0000001154985555__section1112183053510
 ohos {
-    compileSdkVersion 5
+    compileSdkVersion 6
     defaultConfig {
         compatibleSdkVersion 5
     }
@@ -18,7 +19,7 @@ buildscript {
         maven {
             url 'https://developer.huawei.com/repo/'
         }
-		jcenter()
+        jcenter()
     }
     dependencies {
         classpath 'com.huawei.ohos:hap:2.4.4.2'
@@ -35,20 +36,35 @@ allprojects {
         maven {
             url 'https://developer.huawei.com/repo/'
         }
-		jcenter()
         maven {
-            url 'https://maven.google.com'
+            url 'https://mirrors.huaweicloud.com/repository/maven/'
         }
-        mavenLocal()
-        mavenCentral()
+        jcenter()
+    }
+
+    task checkstyle(type: Checkstyle) {
+        showViolations = true
+        configFile file("config/checkstyle.xml")
+
+        source 'entry/src/main/java'
+        source 'videoactiondetection/src/main/java'
+        include '**/*.java'
+
+        // empty classpath
+        classpath = files()
     }
 }
+
+checkstyle {
+    toolVersion "8.43"
+}
+
 sonarqube {
     properties {
-        property "sonar.projectKey", "TVMApp_3d_analysis_mc3"
+        property "sonar.projectKey", "applibgroup_VideoActionDetection"
         property "sonar.organization", "applibgroup"
-        property "sonar.host.url", "http://localhost:9000"
-        property "sonar.sources", "entry"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.sources", "entry,videoactiondetection"
         property "sonar.java.binaries", "entry/build"
     }
 }
