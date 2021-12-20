@@ -1,0 +1,21 @@
+{
+    "app": {
+        "bundleName": "com.example.tvmapp",
+        "vendor": "example",
+        "version": {
+            "code": 1000000,
+            "name": "1.0.0"
+        }
+    },
+    "deviceConfig": {
+    },
+    "module": {
+	   "package": "com.example.videoactiondetection",
+        "deviceType": ["phone", "tablet"],
+        "distro": {
+            "deliveryWithInstall": true,
+            "moduleName": "videoactiondetection",
+			"moduleType": "har"
+        }
+    }
+}
